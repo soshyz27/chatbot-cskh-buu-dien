@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "chu_de": "gio_lam_viec",
+    "cau_hoi_mau": "Bưu cục làm việc giờ nào?",
+    "cau_tra_loi": "8h00–17h00 từ T2–T6"
+  },
+  {
+    "id": 2,
+    "chu_de": "phi_cod",
+    "cau_hoi_mau": "Phí thu hộ COD là bao nhiêu?",
+    "cau_tra_loi": "Tùy giá trị đơn hàng và thỏa thuận hợp đồng, tư vấn tại quầy hoặc app My Vietnam Post"
+  },
+  {
+    "id": 3,
+    "chu_de": "doi_soat_cod",
+    "cau_hoi_mau": "Bao lâu thì nhận được tiền COD?",
+    "cau_tra_loi": "3–7 ngày làm việc sau khi bưu tá nộp tiền, qua PayPost"
+  },
+  {
+    "id": 4,
+    "chu_de": "thoi_gian_ems",
+    "cau_hoi_mau": "Gửi EMS bao lâu thì tới?",
+    "cau_tra_loi": "1–2 ngày nội vùng"
+  },
+  {
+    "id": 5,
+    "chu_de": "dong_goi_de_vo",
+    "cau_hoi_mau": "Đóng gói hàng dễ vỡ thế nào?",
+    "cau_tra_loi": "Bọc ≥2 lớp bubble wrap, chèn mút xốp, hộp carton cứng"
+  },
+  {
+    "id": 6,
+    "chu_de": "dong_goi_hang_long",
+    "cau_hoi_mau": "Đóng gói chai lọ thế nào?",
+    "cau_tra_loi": "Bịt kín nắp, bọc túi nilon chống rò rỉ, đặt trong hộp xốp"
+  },
+  {
+    "id": 7,
+    "chu_de": "dong_goi_tai_lieu",
+    "cau_hoi_mau": "Gửi tài liệu cần lưu ý gì?",
+    "cau_tra_loi": "Phong bì cứng chống nước, niêm phong keo, ký/dấu niêm phong nếu là hồ sơ mật"
+  },
+  {
+    "id": 8,
+    "chu_de": "dong_goi_cuon",
+    "cau_hoi_mau": "Gửi tranh/bản đồ dạng cuộn thế nào?",
+    "cau_tra_loi": "Cuộn vào ống nhựa/carton cứng, dán kín hai đầu"
+  },
+  {
+    "id": 9,
+    "chu_de": "tra_cuu_don_hang",
+    "cau_hoi_mau": "Làm sao tra cứu đơn hàng?",
+    "cau_tra_loi": "Cung cấp mã vận đơn cho chatbot hoặc dùng app My Vietnam Post Plus"
+  },
+  {
+    "id": 10,
+    "chu_de": "quy_trinh_khieu_nai",
+    "cau_hoi_mau": "Khiếu nại thì xử lý bao lâu?",
+    "cau_tra_loi": "Tiếp nhận qua CSKH, tạo ticket, thời gian xử lý tùy loại (nêu rõ trong phản hồi)"
+  },
+  {
+    "id": 11,
+    "chu_de": "tiet_kiem_buu_dien",
+    "cau_hoi_mau": "Gửi tiết kiệm bưu điện thế nào?",
+    "cau_tra_loi": "Mang CCCD/Hộ chiếu đến bưu cục, kỳ hạn tối đa 60 tháng"
+  },
+  {
+    "id": 12,
+    "chu_de": "postpay",
+    "cau_hoi_mau": "PostPay là gì?",
+    "cau_tra_loi": "Ví điện tử của bưu điện, nạp/rút miễn phí, có eKYC"
+  },
+  {
+    "id": 13,
+    "chu_de": "boi_thuong_pti",
+    "cau_hoi_mau": "Bồi thường bảo hiểm PTI mất bao lâu?",
+    "cau_tra_loi": "15 ngày làm việc kể từ khi đủ hồ sơ hợp lệ"
+  },
+  {
+    "id": 14,
+    "chu_de": "dich_vu_hcc",
+    "cau_hoi_mau": "Có nhận hồ sơ hành chính công không?",
+    "cau_tra_loi": "Có, thu gom tại nhà/trả kết quả CCCD, hộ chiếu, GPLX..."
+  },
+  {
+    "id": 15,
+    "chu_de": "luong_huu",
+    "cau_hoi_mau": "Chi trả lương hưu vào ngày nào?",
+    "cau_tra_loi": "Đợt 1: ngày 2–10 tại điểm lưu động; Đợt 2: ngày 11–25 tại bưu cục"
+  },
+  {
+    "id": 16,
+    "chu_de": "loai_van_don",
+    "cau_hoi_mau": "Mã vận đơn bắt đầu bằng R/E nghĩa là gì?",
+    "cau_tra_loi": "R = bưu phẩm bảo đảm (tài liệu); E = EMS (hàng nhanh, giá trị cao)"
+  },
+  {
+    "id": 17,
+    "chu_de": "chuyen_hoan",
+    "cau_hoi_mau": "Đơn hàng bị chuyển hoàn là sao?",
+    "cau_tra_loi": "Người nhận không nhận được hàng (hẹn ngày khác, không liên lạc được...), hàng quay về bưu cục gốc"
+  },
+  {
+    "id": 18,
+    "chu_de": "lien_he_nhan_vien",
+    "cau_hoi_mau": "Tôi muốn nói chuyện với nhân viên thật",
+    "cau_tra_loi": "Chatbot xác nhận và chuyển thông tin cho CSKH hỗ trợ trực tiếp"
+  }
+]
