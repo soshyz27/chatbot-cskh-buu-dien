@@ -96,19 +96,25 @@ LỊCH SỬ HỘI THOẠI GẦN ĐÂY:
 {lich_su}
 
 Phân vào đúng 1 trong 4 nhãn:
-- "tra_cuu_don_hang": khách hỏi về trạng thái/tình trạng một đơn hàng cụ thể
-- "hoi_faq": khách hỏi thông tin chung (giờ làm việc, cách đóng gói, phí, dịch vụ...)
+- "tra_cuu_don_hang": khách hỏi về trạng thái/tình trạng/thông tin một đơn hàng cụ thể - BAO GỒM CẢ khi khách
+  hỏi tiếp về đơn hàng đã nhắc ở lịch sử (VD: hỏi thêm về COD, ngày giao... của đơn vừa tra cứu) mà KHÔNG nhắc
+  lại mã trong tin nhắn mới. Trường hợp này, hãy LẤY LẠI mã vận đơn từ lịch sử hội thoại.
+- "hoi_faq": khách hỏi thông tin chung KHÔNG gắn với 1 đơn hàng cụ thể (giờ làm việc, cách đóng gói, phí,
+  dịch vụ, muốn gặp nhân viên/người thật, v.v.)
 - "khieu_nai": khách phàn nàn, báo lỗi, hoặc đang tiếp tục cung cấp thông tin cho một khiếu nại đã bắt đầu ở lượt trước
-- "khac": không thuộc 3 loại trên (chào hỏi, hỏi ngoài phạm vi bưu điện, yêu cầu gặp nhân viên thật...)
+- "khac": chào hỏi xã giao, hoặc hỏi hoàn toàn ngoài phạm vi dịch vụ bưu chính (thời tiết, thể thao...)
 
-Nếu là "tra_cuu_don_hang": cố gắng trích mã vận đơn (dạng chữ+số, VD: E88392011VN, R77402195VN, hoặc chỉ số+VN).
+Nếu là "tra_cuu_don_hang": trích mã vận đơn từ tin nhắn mới nhất, HOẶC từ lịch sử nếu tin nhắn mới không có mã
+nhưng rõ ràng đang hỏi tiếp về đơn đã nhắc trước đó.
 
-Nếu là "khieu_nai":
-- Trích loại khiếu nại: "cham_giao" / "mat_hang" / "sai_cod" / "khac"
-- Đánh giá "du_thong_tin": true nếu đã có mô tả CỤ THỂ về vấn đề (VD: nói rõ chậm bao lâu, mã đơn nào, thiếu bao nhiêu tiền...),
-  false nếu khách mới nói chung chung kiểu "tôi muốn khiếu nại" mà chưa có chi tiết gì
-- Nếu lượt trước bot đã hỏi thêm thông tin và khách vừa bổ sung ở tin nhắn mới nhất, hãy TỔNG HỢP cả nội dung khiếu nại
-  từ lịch sử + tin nhắn mới vào trường "noi_dung_day_du"
+Nếu là "khieu_nai": phân loại "loai_khieu_nai" theo đúng NGUYÊN NHÂN gốc khách nêu, không phải theo cảm giác chung:
+  - "cham_giao": hàng CHƯA đến tay người nhận, trễ so với hẹn giao
+  - "mat_hang": hàng bị thất lạc, không tìm thấy, không có thông tin theo dõi
+  - "sai_cod": đã giao hàng nhưng NGƯỜI GỬI chưa nhận được tiền COD, hoặc số tiền COD nhận được không đúng
+    (VD: "chưa thấy chuyển khoản tiền COD" = sai_cod, KHÔNG PHẢI cham_giao)
+  - "khac": các phàn nàn khác không thuộc 3 loại trên
+  Đồng thời đánh giá "du_thong_tin": true nếu đã có mô tả CỤ THỂ (mã đơn, số ngày, số tiền...), false nếu còn
+  mơ hồ. Nếu lượt trước bot đã hỏi thêm và khách vừa bổ sung, TỔNG HỢP nội dung đầy đủ vào "noi_dung_day_du".
 
 CHỈ trả về JSON, không thêm chữ nào khác, đúng định dạng:
 {{"intent": "...", "ma_van_don": "..." hoặc null, "loai_khieu_nai": "..." hoặc null, "du_thong_tin": true/false hoặc null, "noi_dung_day_du": "..." hoặc null}}
@@ -135,6 +141,9 @@ def phan_loai_y_dinh(message: str, session_id: str) -> dict:
 SYSTEM_PROMPT_TRA_LOI = """Bạn là trợ lý CSKH của Bưu điện Thành phố.
 Giọng điệu: lịch sự, ngắn gọn, chuyên nghiệp, xưng "chúng tôi".
 CHỈ sử dụng thông tin được cung cấp trong phần "DỮ LIỆU" để trả lời.
+QUAN TRỌNG: nếu trong DỮ LIỆU có câu FAQ khớp đúng với yêu cầu của khách (kể cả yêu cầu gặp nhân viên/người thật),
+hãy làm đúng theo nội dung FAQ đó - KHÔNG tự đặt ra chính sách riêng, KHÔNG từ chối hay "giữ chân" khách ở lại
+với chatbot nếu FAQ không yêu cầu như vậy.
 KHÔNG được tự bịa thêm thông tin ngoài dữ liệu đã cho.
 Nếu khách hỏi ngoài phạm vi dịch vụ bưu điện, lịch sự từ chối và hướng khách quay lại chủ đề bưu chính.
 Hãy tham khảo lịch sử hội thoại để trả lời liền mạch, không hỏi lại thông tin khách đã cung cấp rồi."""
@@ -179,12 +188,17 @@ def chat(request: ChatRequest):
 
     elif intent == "khieu_nai":
         du_thong_tin = phan_loai.get("du_thong_tin")
+        faq_list = db_utils.lay_toan_bo_faq()  # để bot có thể tham khảo (VD: thời gian đối soát COD)
         if du_thong_tin:
             loai = phan_loai.get("loai_khieu_nai") or "khac"
             ma_van_don = phan_loai.get("ma_van_don")
             noi_dung_day_du = phan_loai.get("noi_dung_day_du") or message
             ticket_id = db_utils.tao_ticket(ma_van_don, loai, noi_dung_day_du)
-            du_lieu = f"Đã tạo ticket khiếu nại thành công, mã ticket: {ticket_id}, loại: {loai}."
+            du_lieu = (
+                f"Đã tạo ticket khiếu nại thành công, mã ticket: {ticket_id}, loại: {loai}.\n"
+                f"Các câu hỏi thường gặp có thể liên quan để giải thích thêm cho khách (chỉ dùng nếu phù hợp): "
+                f"{json.dumps(faq_list, ensure_ascii=False)}"
+            )
         else:
             du_lieu = (
                 "Khách đang khiếu nại nhưng CHƯA cung cấp đủ thông tin cụ thể. "
