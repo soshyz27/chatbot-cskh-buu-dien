@@ -1,10 +1,6 @@
 # Hướng dẫn chi tiết dự án: Chatbot AI hỗ trợ CSKH Bưu điện
 ### (Dùng cho báo cáo thực tập Công nghệ thông tin — thời gian thực hiện: 4 tuần)
 
-> **Cách dùng tài liệu này:** Đây là bản đặc tả (spec) đầy đủ cho dự án. Bạn có thể copy nguyên văn từng mục sang bất kỳ AI chatbot nào (ChatGPT, Claude, Gemini...) và yêu cầu: *"Dựa trên đặc tả dự án dưới đây, hãy giúp tôi viết code cho [tên module]"*. Mỗi mục đều đủ ngữ cảnh để AI khác hiểu và hỗ trợ mà không cần giải thích lại từ đầu.
-
----
-
 ## Mục lục
 
 1. [Tổng quan dự án](#1-tổng-quan-dự-án)
