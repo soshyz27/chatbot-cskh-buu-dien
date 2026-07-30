@@ -330,3 +330,5 @@ Chuẩn bị sẵn để chủ động demo, tránh hội đồng hỏi ngoài p
 ---
 
 *Tài liệu này được soạn để hỗ trợ sinh viên thực tập ngành Công nghệ thông tin triển khai dự án chatbot AI CSKH dựa trên quy trình vận hành thực tế quan sát tại đơn vị thực tập bưu điện.*
+
+uvicorn main:app --reload 

@@ -1,0 +1,62 @@
+[
+  {
+    "id": 19,
+    "chu_de": "tra_cuu_loi_he_thong",
+    "cau_hoi_mau": "Sao tôi không tra cứu được đơn hàng trên app?",
+    "cau_tra_loi": "Trong giai đoạn nâng cấp hệ thống, một số đơn hàng có thể tra cứu chậm hoặc chưa hiển thị đúng trạng thái. Quý khách vui lòng cung cấp mã vận đơn để chúng tôi kiểm tra trực tiếp và phản hồi chính xác nhất."
+  },
+  {
+    "id": 20,
+    "chu_de": "cham_cap_nhat_trang_thai",
+    "cau_hoi_mau": "Sao trạng thái đơn hàng của tôi không cập nhật?",
+    "cau_tra_loi": "Đơn hàng có thể đang trong quá trình đồng bộ dữ liệu giữa các hệ thống nội bộ. Chúng tôi sẽ đối chiếu và cập nhật trạng thái chính xác trong thời gian sớm nhất."
+  },
+  {
+    "id": 21,
+    "chu_de": "sms_khong_nhan_duoc",
+    "cau_hoi_mau": "Tại sao tôi không nhận được tin nhắn thông báo đơn hàng?",
+    "cau_tra_loi": "Có thể do lỗi gửi tin nhắn tạm thời hoặc thông tin liên hệ chưa cập nhật đúng. Quý khách vui lòng cung cấp số điện thoại và mã vận đơn để chúng tôi kiểm tra và gửi lại thông báo."
+  },
+  {
+    "id": 22,
+    "chu_de": "sai_cuoc_phi",
+    "cau_hoi_mau": "Tại sao cước phí đơn hàng của tôi không đúng như báo giá ban đầu?",
+    "cau_tra_loi": "Chúng tôi sẽ đối chiếu lại với bảng giá/hợp đồng áp dụng cho đơn hàng của quý khách. Trong thời gian xác minh, đề nghị chưa thanh toán phần chênh lệch; chúng tôi sẽ điều chỉnh hoặc hoàn trả nếu xác nhận có sai lệch."
+  },
+  {
+    "id": 23,
+    "chu_de": "dieu_chinh_thong_tin_don",
+    "cau_hoi_mau": "Tôi muốn sửa địa chỉ hoặc số điện thoại người nhận, phải làm sao?",
+    "cau_tra_loi": "Quý khách liên hệ bưu cục gốc hoặc tổng đài CSKH, cung cấp mã vận đơn và thông tin cần điều chỉnh. Yêu cầu sẽ được xác minh trước khi cập nhật để tránh sai lệch khi giao hàng."
+  },
+  {
+    "id": 24,
+    "chu_de": "cham_giao_do_dieu_phoi",
+    "cau_hoi_mau": "Vì sao đơn hàng của tôi chưa được giao dù đã quá thời hạn hẹn?",
+    "cau_tra_loi": "Một số khu vực có thể đang được điều chỉnh lại tuyến phát trong giai đoạn cập nhật hệ thống. Quý khách cung cấp mã vận đơn để chúng tôi kiểm tra và thông báo thời gian giao dự kiến mới."
+  },
+  {
+    "id": 25,
+    "chu_de": "gian_doan_tam_thoi_buu_cuc",
+    "cau_hoi_mau": "Nhân viên nói hệ thống đang lỗi nên chưa xử lý được, có đúng không?",
+    "cau_tra_loi": "Trong một số thời điểm, bưu cục có thể gặp gián đoạn kết nối tạm thời. Đơn hàng vẫn được xử lý qua phương án dự phòng nội bộ, không ảnh hưởng đến việc giao nhận của quý khách."
+  },
+  {
+    "id": 26,
+    "chu_de": "chuyen_hoan_bat_thuong",
+    "cau_hoi_mau": "Đơn của tôi báo bị chuyển hoàn nhưng tôi chưa hề từ chối nhận hàng, vì sao?",
+    "cau_tra_loi": "Trường hợp này cần được kiểm tra riêng vì có thể liên quan đến cập nhật trạng thái chưa chính xác. Quý khách cung cấp mã vận đơn để chúng tôi xác minh và xử lý kịp thời."
+  },
+  {
+    "id": 27,
+    "chu_de": "trai_nghiem_dich_vu",
+    "cau_hoi_mau": "Tại sao gần đây chất lượng dịch vụ có vẻ giảm so với trước?",
+    "cau_tra_loi": "Bưu điện đang trong giai đoạn nâng cấp hệ thống để phục vụ tốt hơn về lâu dài, có thể phát sinh một số bất tiện tạm thời. Chúng tôi ghi nhận phản ánh của quý khách và đang liên tục cải thiện."
+  },
+  {
+    "id": 28,
+    "chu_de": "yeu_cau_chua_phan_hoi",
+    "cau_hoi_mau": "Tôi đã gửi khiếu nại nhưng chưa thấy phản hồi, phải làm sao?",
+    "cau_tra_loi": "Yêu cầu của quý khách có thể đang trong hàng đợi xử lý. Vui lòng cung cấp mã ticket hoặc mã vận đơn liên quan để chúng tôi tra cứu và thúc đẩy xử lý sớm nhất."
+  }
+]
