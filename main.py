@@ -17,7 +17,6 @@ import re
 import json
 import time
 import uuid
-import logging
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -35,9 +34,6 @@ if not API_KEY:
 client = genai.Client(api_key=API_KEY)
 MODEL_NAME = "gemini-2.5-flash-lite"
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("chatbot_cskh")
-
 app = FastAPI(title="Chatbot CSKH Bưu điện")
 
 # ---------- Lưu trữ lịch sử hội thoại theo session (tạm thời, trong RAM) ----------
@@ -45,17 +41,6 @@ app = FastAPI(title="Chatbot CSKH Bưu điện")
 sessions: dict[str, list[tuple[str, str]]] = {}
 
 SO_LUOT_NHO_TOI_DA = 6  # chỉ nhớ 6 lượt gần nhất, tránh prompt quá dài
-
-# Câu trả lời dự phòng khi có lỗi ngoài dự kiến (Gemini quá tải/gián đoạn/bị chặn nội dung...)
-# Dùng khi demo trực tiếp để tránh trả lỗi 500 thô cho khách/hội đồng xem
-CAU_TRA_LOI_DU_PHONG = (
-    "Xin lỗi, hệ thống đang gặp sự cố kỹ thuật tạm thời và chưa thể xử lý yêu cầu này. "
-    "Bạn vui lòng thử lại sau ít phút, hoặc liên hệ trực tiếp tổng đài CSKH bưu điện để được hỗ trợ ngay."
-)
-
-CAU_TRA_LOI_HET_QUOTA = (
-    "Xin lỗi, hệ thống đang tạm thời quá tải yêu cầu. Bạn vui lòng thử lại sau ít phút nhé."
-)
 
 
 def lay_lich_su(session_id: str) -> str:
@@ -78,9 +63,6 @@ def goi_gemini_co_retry(contents: str, so_lan_thu: int = 3) -> str:
     for lan_thu in range(so_lan_thu):
         try:
             response = client.models.generate_content(model=MODEL_NAME, contents=contents)
-            if not response.text:
-                # Trường hợp hiếm: Gemini trả về rỗng (VD: bị chặn bởi bộ lọc an toàn nội bộ)
-                raise RuntimeError("Gemini trả về nội dung rỗng.")
             return response.text
         except genai_errors.ServerError:
             if lan_thu == so_lan_thu - 1:
@@ -178,8 +160,12 @@ def tao_cau_tra_loi(message: str, du_lieu: str, session_id: str) -> str:
     return goi_gemini_co_retry(prompt)
 
 
-def xu_ly_theo_y_dinh(message: str, session_id: str, phan_loai: dict) -> tuple[str, str]:
-    """Tách logic xử lý theo ý định ra hàm riêng để endpoint /chat gọn và dễ bọc try/except."""
+@app.post("/chat", response_model=ChatResponse)
+def chat(request: ChatRequest):
+    session_id = request.session_id or str(uuid.uuid4())
+    message = request.message
+
+    phan_loai = phan_loai_y_dinh(message, session_id)
     intent = phan_loai.get("intent", "khac")
 
     if intent == "tra_cuu_don_hang":
@@ -228,31 +214,9 @@ def xu_ly_theo_y_dinh(message: str, session_id: str, phan_loai: dict) -> tuple[s
             "Không có dữ liệu đặc biệt - tin nhắn ngoài phạm vi tra cứu/FAQ/khiếu nại.",
             session_id,
         )
-
-    return intent, reply
-
-
-@app.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest):
-    session_id = request.session_id or str(uuid.uuid4())
-    message = request.message
-
-    # Bọc toàn bộ luồng xử lý trong try/except: nếu Gemini quá tải, hết quota, bị chặn nội dung,
-    # hoặc có lỗi ngoài dự kiến khác, chatbot vẫn trả lời lịch sự thay vì lỗi 500 giữa buổi demo.
-    try:
-        phan_loai = phan_loai_y_dinh(message, session_id)
-        intent, reply = xu_ly_theo_y_dinh(message, session_id, phan_loai)
-    except RuntimeError as e:
-        logger.warning("Lỗi RuntimeError khi xử lý /chat (session=%s): %s", session_id, e)
-        if "quota" in str(e).lower() or "RESOURCE_EXHAUSTED" in str(e):
-            reply = CAU_TRA_LOI_HET_QUOTA
-        else:
-            reply = CAU_TRA_LOI_DU_PHONG
-        intent = "loi_he_thong"
-    except Exception as e:
-        logger.exception("Lỗi không xác định khi xử lý /chat (session=%s): %s", session_id, e)
-        reply = CAU_TRA_LOI_DU_PHONG
-        intent = "loi_he_thong"
+        # Ghi log để admin xem lại định kỳ - có thể đây là câu hỏi hợp lệ mà
+        # chatbot chưa được dạy cách xử lý, cần bổ sung FAQ mới (có kiểm duyệt)
+        db_utils.ghi_log_cau_hoi_chua_xu_ly(message, intent)
 
     luu_vao_lich_su(session_id, "user", message)
     luu_vao_lich_su(session_id, "bot", reply)
