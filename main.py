@@ -25,6 +25,7 @@ from google import genai
 from google.genai import errors as genai_errors
 
 import db_utils
+import geocode_utils
 
 load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
@@ -222,6 +223,98 @@ def chat(request: ChatRequest):
     luu_vao_lich_su(session_id, "bot", reply)
 
     return ChatResponse(reply=reply, intent=intent, session_id=session_id)
+
+
+# ---------- Endpoint tra cứu vị trí đơn hàng trên bản đồ ----------
+
+class DiaDiem(BaseModel):
+    lat: float
+    lng: float
+    nhan: str  # nhãn hiển thị khi bấm vào điểm trên bản đồ
+
+
+class TraCuuBanDoResponse(BaseModel):
+    tim_thay: bool
+    ma_van_don: str
+    trang_thai: str | None = None
+    loai_icon: str | None = None  # "xe_tai" | "buu_cuc" | "hoan_tat" | "hoan_ve"
+    diem_giao: DiaDiem | None = None
+    diem_hien_tai: DiaDiem | None = None
+    thong_bao: str | None = None  # nội dung hiện khi bấm vào icon vị trí hiện tại
+    loi: str | None = None
+
+
+@app.get("/tra-cuu-ban-do", response_model=TraCuuBanDoResponse)
+def tra_cuu_ban_do(ma_van_don: str):
+    ma_van_don = ma_van_don.strip().upper()
+    don_hang = db_utils.tra_cuu_don_hang(ma_van_don)
+
+    if not don_hang:
+        return TraCuuBanDoResponse(
+            tim_thay=False,
+            ma_van_don=ma_van_don,
+            loi=f"Không tìm thấy đơn hàng với mã '{ma_van_don}'. Vui lòng kiểm tra lại mã vận đơn.",
+        )
+
+    trang_thai = don_hang["trang_thai"]
+    dia_chi_nhan = don_hang["dia_chi_nhan"]
+
+    toa_do_giao = geocode_utils.geocode(dia_chi_nhan)
+    if not toa_do_giao:
+        return TraCuuBanDoResponse(
+            tim_thay=False,
+            ma_van_don=ma_van_don,
+            loi=f"Không thể xác định vị trí trên bản đồ cho địa chỉ '{dia_chi_nhan}'.",
+        )
+
+    diem_giao = DiaDiem(
+        lat=toa_do_giao["lat"], lng=toa_do_giao["lng"],
+        nhan=f"Điểm giao: {dia_chi_nhan}",
+    )
+
+    cod_text = f", COD {don_hang['so_tien_cod']:,}đ".replace(",", ".") if don_hang["so_tien_cod"] else ""
+
+    if trang_thai in ("Đang vận chuyển", "Đang giao"):
+        toa_do_hien_tai = geocode_utils.geocode(don_hang["vi_tri_hien_tai"])
+        diem_hien_tai = (
+            DiaDiem(lat=toa_do_hien_tai["lat"], lng=toa_do_hien_tai["lng"], nhan=don_hang["vi_tri_hien_tai"])
+            if toa_do_hien_tai else diem_giao  # dự phòng: không geocode được thì hiện tạm ở điểm giao
+        )
+        loai_icon = "xe_tai"
+        thong_bao = f"Đang giao - dự kiến giao {don_hang['ngay_du_kien_giao']}{cod_text}"
+
+    elif trang_thai == "Đã giao thành công":
+        diem_hien_tai = diem_giao  # trùng nhau đúng như thiết kế
+        loai_icon = "hoan_tat"
+        thong_bao = f"Đã giao thành công{cod_text}"
+
+    elif trang_thai == "Đã tiếp nhận":
+        toa_do_bc = geocode_utils.geocode(don_hang["buu_cuc_xu_ly"])
+        diem_hien_tai = (
+            DiaDiem(lat=toa_do_bc["lat"], lng=toa_do_bc["lng"], nhan=don_hang["buu_cuc_xu_ly"])
+            if toa_do_bc else None
+        )
+        loai_icon = "buu_cuc"
+        thong_bao = f"Đã tiếp nhận, đang chờ vận chuyển tại {don_hang['buu_cuc_xu_ly']}"
+
+    else:  # Chuyển hoàn
+        toa_do_bc = geocode_utils.geocode(don_hang["buu_cuc_xu_ly"])
+        diem_hien_tai = (
+            DiaDiem(lat=toa_do_bc["lat"], lng=toa_do_bc["lng"], nhan=don_hang["buu_cuc_xu_ly"])
+            if toa_do_bc else None
+        )
+        loai_icon = "hoan_ve"
+        thong_bao = f"Đơn hàng đã chuyển hoàn về {don_hang['buu_cuc_xu_ly']}"
+
+    return TraCuuBanDoResponse(
+        tim_thay=True,
+        ma_van_don=ma_van_don,
+        trang_thai=trang_thai,
+        loai_icon=loai_icon,
+        diem_giao=diem_giao,
+        diem_hien_tai=diem_hien_tai,
+        thong_bao=thong_bao,
+    )
 
 
 @app.get("/")

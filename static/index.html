@@ -2,55 +2,149 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<title>Chatbot CSKH Bưu điện</title>
+<title>Bưu điện Thành phố — Tra cứu & CSKH</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
   * { box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f0f2f5;
+  html, body {
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
-  }
-  .chat-container {
-    width: 420px;
-    height: 640px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    display: flex;
-    flex-direction: column;
+    font-family: 'Segoe UI', Arial, sans-serif;
     overflow: hidden;
   }
-  .chat-header {
+  .layout {
+    display: flex;
+    height: 100vh;
+  }
+
+  /* ---------- CỘT BẢN ĐỒ (3/4) ---------- */
+  .map-panel {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .map-toolbar {
     background: #c8102e;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .map-toolbar .logo {
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .map-toolbar .logo span {
+    display: block;
+    font-weight: 400;
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  .search-box {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    max-width: 420px;
+  }
+  .search-box input {
+    flex: 1;
+    padding: 9px 14px;
+    border-radius: 20px;
+    border: none;
+    font-size: 14px;
+    outline: none;
+  }
+  .search-box button {
+    background: #7a0a1c;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 9px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .search-box button:hover { background: #5e0815; }
+  .search-box button:disabled { background: #b46;  cursor: not-allowed; opacity: 0.6; }
+
+  .status-banner {
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    font-size: 13px;
+    transition: all 0.2s ease;
+  }
+  .status-banner.show {
+    padding: 8px 20px;
+    max-height: 60px;
+  }
+  .status-banner.info { background: #fff4e5; color: #7a4a00; }
+  .status-banner.error { background: #fdecec; color: #a1262a; }
+
+  #map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 10px 14px;
+    font-size: 12px;
+    z-index: 500;
+    line-height: 1.8;
+  }
+  .legend b { display: block; margin-bottom: 4px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+
+  /* ---------- CỘT CHATBOT (1/4) ---------- */
+  .chat-panel {
+    flex: 1;
+    min-width: 280px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #ddd;
+    background: #fff;
+  }
+  .chat-header {
+    background: #7a0a1c;
     color: white;
     padding: 16px;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 15px;
   }
   .chat-header span {
     display: block;
     font-weight: 400;
-    font-size: 12px;
+    font-size: 11px;
     opacity: 0.85;
     margin-top: 2px;
   }
   .chat-messages {
     flex: 1;
-    padding: 16px;
+    padding: 14px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
   .msg {
-    max-width: 78%;
-    padding: 10px 14px;
+    max-width: 88%;
+    padding: 9px 13px;
     border-radius: 14px;
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.4;
     white-space: pre-wrap;
   }
@@ -79,61 +173,222 @@
     align-self: flex-start;
     color: #888;
     font-style: italic;
-    font-size: 13px;
+    font-size: 12.5px;
   }
   .chat-input {
     display: flex;
-    padding: 12px;
+    padding: 10px;
     border-top: 1px solid #eee;
-    gap: 8px;
+    gap: 6px;
   }
   .chat-input input {
     flex: 1;
-    padding: 10px 14px;
+    padding: 9px 12px;
     border: 1px solid #ddd;
     border-radius: 20px;
     outline: none;
-    font-size: 14px;
+    font-size: 13.5px;
+    min-width: 0;
   }
-  .chat-input input:focus {
-    border-color: #c8102e;
-  }
+  .chat-input input:focus { border-color: #c8102e; }
   .chat-input button {
     background: #c8102e;
     color: white;
     border: none;
     border-radius: 20px;
-    padding: 10px 18px;
+    padding: 9px 16px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13.5px;
   }
-  .chat-input button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+  .chat-input button:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* Icon marker tuỳ chỉnh trên bản đồ */
+  .marker-icon {
+    font-size: 22px;
+    text-align: center;
+    line-height: 1;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 </style>
 </head>
 <body>
 
-<div class="chat-container">
-  <div class="chat-header">
-    Chatbot CSKH Bưu điện
-    <span>Tra cứu đơn hàng · Hỏi đáp · Khiếu nại</span>
+<div class="layout">
+
+  <!-- CỘT BẢN ĐỒ -->
+  <div class="map-panel">
+    <div class="map-toolbar">
+      <div class="logo">Tra cứu đơn hàng<span>Bưu điện Thành phố</span></div>
+      <div class="search-box">
+        <input type="text" id="maVanDonInput" placeholder="Nhập mã vận đơn, VD: E88392011VN" autocomplete="off">
+        <button id="timKiemBtn">Tra cứu</button>
+      </div>
+    </div>
+    <div id="statusBanner" class="status-banner"></div>
+    <div style="position: relative; flex: 1; min-height: 0;">
+      <div id="map"></div>
+      <div class="legend">
+        <b>Chú giải</b>
+        <div class="legend-item">🚚 Đang vận chuyển / đang giao</div>
+        <div class="legend-item">🏤 Đang chờ tại bưu cục</div>
+        <div class="legend-item">✅ Đã giao thành công</div>
+        <div class="legend-item">↩️ Đã chuyển hoàn</div>
+        <div class="legend-item">🏁 Điểm giao hàng</div>
+      </div>
+    </div>
   </div>
-  <div class="chat-messages" id="messages">
-    <div class="msg bot">Xin chào! Chúng tôi có thể giúp gì cho bạn? Bạn có thể hỏi về tình trạng đơn hàng, các câu hỏi thường gặp, hoặc gửi khiếu nại.</div>
+
+  <!-- CỘT CHATBOT -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      Chatbot CSKH
+      <span>Hỏi đáp · Khiếu nại · Tra cứu bằng chữ</span>
+    </div>
+    <div class="chat-messages" id="messages">
+      <div class="msg bot">Xin chào! Bạn có thể hỏi tôi về FAQ, khiếu nại, hoặc gõ mã vận đơn ở khung tìm kiếm bên trái để xem trên bản đồ.</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Nhập tin nhắn..." autocomplete="off">
+      <button id="sendBtn">Gửi</button>
+    </div>
   </div>
-  <div class="chat-input">
-    <input type="text" id="userInput" placeholder="Nhập tin nhắn..." autocomplete="off">
-    <button id="sendBtn">Gửi</button>
-  </div>
+
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+/* ================== PHẦN BẢN ĐỒ ================== */
+
+const map = L.map('map', { zoomControl: true }).setView([16.05, 108.0], 5.3); // mặc định nhìn toàn VN
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 19,
+}).addTo(map);
+
+let cacMarkerHienTai = [];
+let duongKeHienTai = null;
+
+function taoIcon(emoji) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="marker-icon">${emoji}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
+  });
+}
+
+const ICON_THEO_LOAI = {
+  xe_tai: taoIcon('🚚'),
+  buu_cuc: taoIcon('🏤'),
+  hoan_tat: taoIcon('✅'),
+  hoan_ve: taoIcon('↩️'),
+};
+const ICON_DIEM_GIAO = taoIcon('🏁');
+
+function xoaMarkerCu() {
+  cacMarkerHienTai.forEach(m => map.removeLayer(m));
+  cacMarkerHienTai = [];
+  if (duongKeHienTai) {
+    map.removeLayer(duongKeHienTai);
+    duongKeHienTai = null;
+  }
+}
+
+function hienThiBanner(text, loai) {
+  const el = document.getElementById('statusBanner');
+  el.textContent = text;
+  el.className = 'status-banner show ' + loai;
+}
+
+function anBanner() {
+  const el = document.getElementById('statusBanner');
+  el.className = 'status-banner';
+}
+
+async function traCuuBanDo() {
+  const input = document.getElementById('maVanDonInput');
+  const btn = document.getElementById('timKiemBtn');
+  const maVanDon = input.value.trim();
+  if (!maVanDon) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Đang tra...';
+  anBanner();
+
+  try {
+    const res = await fetch('/tra-cuu-ban-do?ma_van_don=' + encodeURIComponent(maVanDon));
+    const data = await res.json();
+
+    xoaMarkerCu();
+
+    if (!data.tim_thay) {
+      hienThiBanner(data.loi || 'Không tìm thấy đơn hàng, vui lòng nhập đúng mã vận đơn.', 'error');
+      return;
+    }
+
+    const diemGiao = data.diem_giao;
+    const diemHienTai = data.diem_hien_tai;
+    const icon = ICON_THEO_LOAI[data.loai_icon] || ICON_DIEM_GIAO;
+
+    if (data.loai_icon === 'hoan_tat') {
+      // Đã giao thành công - 2 điểm trùng nhau, chỉ hiện 1 marker
+      const m = L.marker([diemGiao.lat, diemGiao.lng], { icon })
+        .addTo(map)
+        .bindPopup(`<b>${data.trang_thai}</b><br>${data.thong_bao}`)
+        .openPopup();
+      cacMarkerHienTai.push(m);
+      map.setView([diemGiao.lat, diemGiao.lng], 14);
+    } else {
+      // Các trạng thái khác: hiện điểm hiện tại + điểm giao, nối bằng đường đứt nét
+      const mGiao = L.marker([diemGiao.lat, diemGiao.lng], { icon: ICON_DIEM_GIAO })
+        .addTo(map)
+        .bindPopup(`<b>Điểm giao hàng</b><br>${diemGiao.nhan}`);
+      cacMarkerHienTai.push(mGiao);
+
+      if (diemHienTai) {
+        const mHienTai = L.marker([diemHienTai.lat, diemHienTai.lng], { icon })
+          .addTo(map)
+          .bindPopup(`<b>${data.trang_thai}</b><br>${data.thong_bao}`)
+          .openPopup();
+        cacMarkerHienTai.push(mHienTai);
+
+        const bounds = L.latLngBounds(
+          [diemHienTai.lat, diemHienTai.lng],
+          [diemGiao.lat, diemGiao.lng]
+        );
+        map.fitBounds(bounds, { padding: [60, 60] });
+        
+        // duongKeHienTai = L.polyline(
+        //   [[diemHienTai.lat, diemHienTai.lng], [diemGiao.lat, diemGiao.lng]],
+        //   { color: '#c8102e', weight: 2, dashArray: '6, 8', opacity: 0.7 }
+        // ).addTo(map);
+
+        // map.fitBounds(duongKeHienTai.getBounds(), { padding: [60, 60] });
+      } else {
+        map.setView([diemGiao.lat, diemGiao.lng], 13);
+      }
+    }
+  } catch (err) {
+    hienThiBanner('Lỗi kết nối server: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Tra cứu';
+  }
+}
+
+document.getElementById('timKiemBtn').addEventListener('click', traCuuBanDo);
+document.getElementById('maVanDonInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') traCuuBanDo();
+});
+
+/* ================== PHẦN CHATBOT (giữ nguyên logic cũ) ================== */
+
 const messagesEl = document.getElementById('messages');
 const inputEl = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
-let sessionId = null; // sẽ được gán sau lần gọi /chat đầu tiên
+let sessionId = null;
 
 function appendMessage(text, sender, intent) {
   const div = document.createElement('div');
@@ -168,9 +423,7 @@ async function sendMessage() {
       body: JSON.stringify({ message: text, session_id: sessionId })
     });
 
-    if (!res.ok) {
-      throw new Error('Server trả về lỗi ' + res.status);
-    }
+    if (!res.ok) throw new Error('Server trả về lỗi ' + res.status);
 
     const data = await res.json();
     sessionId = data.session_id;

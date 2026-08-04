@@ -131,17 +131,17 @@ Tôi muốn khiếu nại
 
 | # | Kịch bản | Kết quả (✅/❌) | Ghi chú lỗi (nếu có) |
 |---|---|---|---|
-| 1 | Giờ làm việc | | |
-| 2 | Phí COD | | |
-| 3 | Tra cứu mã hợp lệ | | |
-| 4 | Tra cứu mã không tồn tại | | |
-| 5 | Đóng gói dễ vỡ | | |
-| 6 | Khiếu nại giao chậm | | |
-| 7 | Khiếu nại sai COD | | |
-| 8 | Bồi thường PTI | | |
-| 9 | Ngoài phạm vi | | |
-| 10 | Ngữ cảnh đa lượt | | |
-| 11 | Gặp nhân viên thật | | |
+| 1 | Giờ làm việc | ✅ | Đã test đạt |
+| 2 | Phí COD | ✅ | Đã test đạt |
+| 3 | Tra cứu mã hợp lệ | ✅ | Đã test đạt |
+| 4 | Tra cứu mã không tồn tại | ✅ | Đã test đạt |
+| 5 | Đóng gói dễ vỡ | ✅ | Đã test đạt |
+| 6 | Khiếu nại giao chậm | ✅ | Đã test đạt |
+| 7 | Khiếu nại sai COD | ✅ | Đã test đạt |
+| 8 | Bồi thường PTI | ✅ | Đã test đạt |
+| 9 | Ngoài phạm vi | ✅ | Đã test đạt |
+| 10 | Ngữ cảnh đa lượt | ✅ | Đã test đạt |
+| 11 | Gặp nhân viên thật | ✅ | Đã test đạt |
 | 12 | Khiếu nại thiếu tin | ✅ | Đã test đạt |
 
 **Mục tiêu theo đặc tả:** đạt ≥ 80% (tức tối thiểu 10/12 kịch bản đạt) mới coi là đạt yêu cầu demo.

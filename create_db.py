@@ -12,7 +12,7 @@ import json
 import sqlite3
 import os
 
-# ---- Cấu hình đường dẫn (sửa lại nếu file JSON của bạn ở nơi khác) ----
+# ---- Cấu hình đường dẫn (sửa lại nếu file JSON ở nơi khác) ----
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FAQ_JSON_PATH = os.path.join(BASE_DIR, "FAQ.json")
 ORDER_JSON_PATH = os.path.join(BASE_DIR, "order.json")
@@ -44,7 +44,9 @@ def create_tables(conn: sqlite3.Connection) -> None:
             ngay_gui TEXT,
             ngay_du_kien_giao TEXT,
             so_tien_cod INTEGER DEFAULT 0,
-            loai_dich_vu TEXT
+            loai_dich_vu TEXT,
+            vi_tri_hien_tai TEXT,
+            buu_cuc_xu_ly TEXT
         )
     """)
 
@@ -87,8 +89,9 @@ def load_orders(conn: sqlite3.Connection) -> int:
         cursor.execute(
             """INSERT INTO orders
                (ma_van_don, ten_nguoi_gui, ten_nguoi_nhan, dia_chi_nhan,
-                trang_thai, ngay_gui, ngay_du_kien_giao, so_tien_cod, loai_dich_vu)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                trang_thai, ngay_gui, ngay_du_kien_giao, so_tien_cod, loai_dich_vu,
+                vi_tri_hien_tai, buu_cuc_xu_ly)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 item["ma_van_don"],
                 item["ten_nguoi_gui"],
@@ -99,6 +102,8 @@ def load_orders(conn: sqlite3.Connection) -> int:
                 item["ngay_du_kien_giao"],
                 item["so_tien_cod"],
                 item["loai_dich_vu"],
+                item.get("vi_tri_hien_tai"),
+                item.get("buu_cuc_xu_ly"),
             ),
         )
     conn.commit()

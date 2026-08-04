@@ -18,11 +18,6 @@ def get_connection():
 
 
 def dam_bao_bang_log_ton_tai(conn: sqlite3.Connection):
-    """
-    Tạo bảng cau_hoi_chua_xu_ly nếu chưa có (CREATE TABLE IF NOT EXISTS).
-    Không dùng DROP TABLE ở đây vì hàm này chạy mỗi lần mở kết nối -
-    phải an toàn, không được xóa dữ liệu đã tích lũy.
-    """
     conn.execute("""
         CREATE TABLE IF NOT EXISTS cau_hoi_chua_xu_ly (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,6 +26,21 @@ def dam_bao_bang_log_ton_tai(conn: sqlite3.Connection):
             thoi_gian TEXT NOT NULL,
             da_xu_ly INTEGER NOT NULL DEFAULT 0
         )
+    """)
+
+    # MỚI: bảng lưu lịch sử hội thoại theo session
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS lich_su_hoi_thoai (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT NOT NULL,
+            vai_tro TEXT NOT NULL,
+            noi_dung TEXT NOT NULL,
+            thoi_gian TEXT NOT NULL
+        )
+    """)
+    conn.execute("""
+        CREATE INDEX IF NOT EXISTS idx_lich_su_session
+        ON lich_su_hoi_thoai (session_id, id)
     """)
     conn.commit()
 
@@ -151,5 +161,34 @@ def them_faq_moi(chu_de: str, cau_hoi_mau: str, cau_tra_loi: str) -> int:
         )
         conn.commit()
         return id_moi
+    finally:
+        conn.close()
+
+# ---------- Lịch sử hội thoại (lưu SQLite thay vì RAM) ----------
+
+def luu_tin_nhan(session_id: str, vai_tro: str, noi_dung: str) -> None:
+    """Lưu 1 lượt tin nhắn (user hoặc bot) vào bảng lich_su_hoi_thoai."""
+    conn = get_connection()
+    try:
+        conn.execute(
+            """INSERT INTO lich_su_hoi_thoai (session_id, vai_tro, noi_dung, thoi_gian)
+               VALUES (?, ?, ?, ?)""",
+            (session_id, vai_tro, noi_dung, datetime.now().isoformat(timespec="seconds")),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def lay_lich_su_gan_day(session_id: str, so_luot: int = 6) -> list[dict]:
+    """Lấy N lượt gần nhất của 1 session, trả về theo thứ tự thời gian tăng dần."""
+    conn = get_connection()
+    try:
+        rows = conn.execute(
+            """SELECT vai_tro, noi_dung FROM lich_su_hoi_thoai
+               WHERE session_id = ? ORDER BY id DESC LIMIT ?""",
+            (session_id, so_luot),
+        ).fetchall()
+        return [dict(r) for r in reversed(rows)]
     finally:
         conn.close()
