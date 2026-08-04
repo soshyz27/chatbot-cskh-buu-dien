@@ -4,4 +4,5 @@ __pycache__/
 *.db
 .json
 test_scenarios/
-.md
+huong_dan_du_an_chatbot_cskh_buu_dien/
+them_faq_bo_sung/
