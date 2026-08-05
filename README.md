@@ -52,9 +52,7 @@ chatbot_project/
 ├── db_utils.py                 # Các hàm truy vấn database
 ├── geocode_utils.py              # Geocode địa chỉ sang tọa độ (Nominatim), có cache
 ├── create_db.py                   # Script khởi tạo database từ dữ liệu JSON
-├── FAQ.json                        # 18 câu FAQ gốc
-├── faq_bo_sung.json                 # 10 câu FAQ bổ sung (từ phân tích rủi ro vận hành)
-├── them_faq_bo_sung.py                # Script gộp FAQ bổ sung vào database
+├── FAQ.json                        # 28 câu FAQ (18 gốc + 10 bổ sung từ phân tích rủi ro vận hành)
 ├── order.json                          # 30 đơn hàng mẫu (đủ 5 trạng thái, có vị trí hiện tại)
 ├── xem_cau_hoi_chua_xu_ly.py             # CLI admin: xem log câu hỏi chưa xử lý + thêm FAQ
 ├── static/index.html                      # Giao diện 2 cột: bản đồ (3/4) + chatbot (1/4)
@@ -88,7 +86,6 @@ chatbot_project/
 4. Khởi tạo database:
    ```bash
    python create_db.py
-   python them_faq_bo_sung.py   # gộp thêm 10 FAQ bổ sung
    ```
 
 5. Chạy server:
