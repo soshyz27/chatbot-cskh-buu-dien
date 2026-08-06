@@ -57,22 +57,6 @@ def tra_cuu_don_hang(ma_van_don: str) -> dict | None:
         conn.close()
 
 
-def tim_faq_lien_quan(tu_khoa: str, gioi_han: int = 3) -> list[dict]:
-    """
-    Tìm các câu FAQ có liên quan bằng cách so khớp từ khóa đơn giản (LIKE).
-    Đây là cách tìm kiếm cơ bản - đủ dùng cho demo với 18 câu FAQ.
-    """
-    conn = get_connection()
-    try:
-        rows = conn.execute(
-            "SELECT * FROM faq WHERE cau_hoi_mau LIKE ? OR cau_tra_loi LIKE ? OR chu_de LIKE ? LIMIT ?",
-            (f"%{tu_khoa}%", f"%{tu_khoa}%", f"%{tu_khoa}%", gioi_han),
-        ).fetchall()
-        return [dict(r) for r in rows]
-    finally:
-        conn.close()
-
-
 def lay_toan_bo_faq() -> list[dict]:
     """Lấy toàn bộ 18 câu FAQ - dùng khi cần đưa hết cho Gemini tham khảo."""
     conn = get_connection()

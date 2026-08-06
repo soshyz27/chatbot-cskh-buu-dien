@@ -39,25 +39,23 @@ app = FastAPI(title="Chatbot CSKH Bưu điện")
 
 # ---------- Lưu trữ lịch sử hội thoại theo session (tạm thời, trong RAM) ----------
 # Dạng: { session_id: [ ("user", "..."), ("bot", "..."), ... ] }
-sessions: dict[str, list[tuple[str, str]]] = {}
+# sessions: dict[str, list[tuple[str, str]]] = {}
 
-SO_LUOT_NHO_TOI_DA = 6  # chỉ nhớ 6 lượt gần nhất, tránh prompt quá dài
-
+SO_LUOT_NHO_TOI_DA = 6
 
 def lay_lich_su(session_id: str) -> str:
-    lich_su = sessions.get(session_id, [])
-    gan_day = lich_su[-SO_LUOT_NHO_TOI_DA:]
+    gan_day = db_utils.lay_lich_su_gan_day(session_id, SO_LUOT_NHO_TOI_DA)
     if not gan_day:
         return "(Chưa có lịch sử - đây là tin nhắn đầu tiên trong phiên)"
     dong = []
-    for vai_tro, noi_dung in gan_day:
-        nhan = "Khách" if vai_tro == "user" else "Chatbot"
-        dong.append(f"{nhan}: {noi_dung}")
+    for item in gan_day:
+        nhan = "Khách" if item["vai_tro"] == "user" else "Chatbot"
+        dong.append(f"{nhan}: {item['noi_dung']}")
     return "\n".join(dong)
 
 
 def luu_vao_lich_su(session_id: str, vai_tro: str, noi_dung: str):
-    sessions.setdefault(session_id, []).append((vai_tro, noi_dung))
+    db_utils.luu_tin_nhan(session_id, vai_tro, noi_dung)
 
 
 def goi_gemini_co_retry(contents: str, so_lan_thu: int = 3) -> str:
